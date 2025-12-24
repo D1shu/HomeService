@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1044732433216",
+    "project_id": "homeservice-dc9ff",
+    "storage_bucket": "homeservice-dc9ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044732433216:android:c1a203eb18d460d36560a5",
+        "android_client_info": {
+          "package_name": "com.example.homeservice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAw3wJRcvUdFa5d2oqUnKZYkzlAOnoTL4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

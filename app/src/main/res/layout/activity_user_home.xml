@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_bg"
+    tools:context=".activities.MainActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="90dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginVertical="16dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/gradient_bg2"
+                    android:elevation="3dp"
+                    android:minWidth="180dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profilePic"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:shapeAppearance="@style/circleImage"
+                        tools:srcCompat="@tools:sample/avatars" />
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/welcome"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toEndOf="@+id/profilePic"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/nameTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/name"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/textView1"
+                        app:layout_constraintTop_toBottomOf="@+id/textView1" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginVertical="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/gradient_bg2"
+                    android:elevation="3dp"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/location" />
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginVertical="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/gradient_bg2"
+                    android:elevation="3dp"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/cart" />
+
+                <ImageView
+                    android:id="@+id/logoutBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginVertical="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/gradient_bg2"
+                    android:elevation="3dp"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_lock_power_off"
+                    app:tint="#FF0000" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/smart_home_nsmooth_services"
+                android:textColor="@color/black"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editTextText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/gradient_bg2"
+                android:drawableStart="@drawable/search"
+                android:drawablePadding="8dp"
+                android:elevation="3dp"
+                android:ems="10"
+                android:hint="Search Services..."
+                android:inputType="text"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                android:textSize="14sp" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/categoryList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="8dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ProgressBar
+                    android:id="@+id/progressBarcategory"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="16dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/circleImage"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/gradient_bg2"
+        android:elevation="3dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scrollView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/homeBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.25"
+                app:srcCompat="@drawable/bottom_btn1"
+                android:padding="18dp"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/exploreBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.25"
+                app:srcCompat="@drawable/bottom_btn2"
+                android:padding="18dp"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/baskmarkBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.25"
+                app:srcCompat="@drawable/bottom_btn3"
+                android:padding="18dp"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/profileBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.25"
+                app:srcCompat="@drawable/bottom_btn4"
+                android:padding="18dp"
+                android:layout_gravity="center"/>
+
+
+        </LinearLayout>
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

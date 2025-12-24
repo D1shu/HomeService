@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Home Service</string>
+    <string name="welcome">Welcome</string>
+    <string name="name">Name</string>
+    <string name="smart_home_nsmooth_services">Smart Home, \nSmooth Services</string>
+    <string name="title">title</string>
+    <string name="smart_solutions_for_your_home">Smart Solutions for Your Home</string>
+    <string name="home_service">Home Service</string>
+
+    //default_web_client_id
+    <string name="default_web_client_id">1044732433216-6um2i587d2hhja8l1h8kk8vmol8lt84a.apps.googleusercontent.com</string>
+
+</resources>
