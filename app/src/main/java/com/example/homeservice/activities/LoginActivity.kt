@@ -10,16 +10,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.homeservice.R
+import com.example.homeservice.models.UserModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
 
-    // Variables
     private lateinit var etEmail: EditText
     private lateinit var etPassword: EditText
     private lateinit var btnLogin: Button
@@ -27,32 +28,31 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tvSignUp: TextView
     private lateinit var tvForgotPassword: TextView
 
-    // Firebase and Google Variables
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
     private lateinit var googleSignInClient: GoogleSignInClient
-    private val RC_SIGN_IN = 9001 // Google Login mate no Request Code
+    private val RC_SIGN_IN = 9001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Firebase initialize
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
-        // --- Google Sign In Setup ---
+        // Google Sign In Setup
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // Aa string automatic google-services.json mathi aavse
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Jo user pehle thi login hoy, to sidho Home screen par mokli do
+        // Check if already logged in
         if (auth.currentUser != null) {
-            goToHomeActivity()
+            checkRoleAndRedirect(auth.currentUser!!.uid) // [Updated]
         }
 
-        // Views Bind
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
@@ -60,109 +60,143 @@ class LoginActivity : AppCompatActivity() {
         tvSignUp = findViewById(R.id.tvSignUp)
         tvForgotPassword = findViewById(R.id.tvForgotPassword)
 
-        // 1. Simple Email Login Click
         btnLogin.setOnClickListener {
             loginUser()
         }
 
-        // 2. Google Login Button Click
         btnGoogleLogin.setOnClickListener {
             signInWithGoogle()
         }
 
-        // Sign Up Text Click
         tvSignUp.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
 
-        // Forgot Password
         tvForgotPassword.setOnClickListener {
             Toast.makeText(this, "Forgot Password feature coming soon!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // --- Google Sign In Function (UPDATED FOR ACCOUNT CHOOSER) ---
     private fun signInWithGoogle() {
-        // Pehla Google Client mathi Sign Out karo, jethi dar vakhte account list batave
         googleSignInClient.signOut().addOnCompleteListener {
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, RC_SIGN_IN)
         }
     }
 
-    // --- Jyare Google Account Select kari ne pacha aave tyare ---
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...)
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google account success madyu, have Firebase sathe link karo
                 val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                // Google Sign In Failed
                 Log.w("GoogleLogin", "Google sign in failed", e)
-                Toast.makeText(this, "Google Sign In Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Google Sign In Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // --- Firebase Auth with Google Token ---
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success
-                    Toast.makeText(this, "Google Login Successful!", Toast.LENGTH_SHORT).show()
-                    goToHomeActivity()
+                    val user = auth.currentUser
+                    checkUserInFirestore(user?.uid, user?.displayName, user?.email)
                 } else {
-                    // If sign in fails
                     Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    // --- Simple Email/Password Login Function ---
+    private fun checkUserInFirestore(uid: String?, name: String?, email: String?) {
+        if (uid == null) return
+
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // User exists, check role and redirect
+                    checkRoleAndRedirect(uid) // [Updated]
+                } else {
+                    // New User -> Save as Customer
+                    val newUser = UserModel(
+                        uid = uid,
+                        name = name ?: "Unknown",
+                        email = email ?: "",
+                        role = "customer"
+                    )
+                    db.collection("users").document(uid).set(newUser)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Account Created!", Toast.LENGTH_SHORT).show()
+                            checkRoleAndRedirect(uid) // [Updated]
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Error creating profile", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                }
+            }
+    }
+
     private fun loginUser() {
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
 
         if (email.isEmpty()) {
-            etEmail.error = "Email is required"
-            etEmail.requestFocus()
-            return
+            etEmail.error = "Email is required"; return
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.error = "Please enter valid email"
-            etEmail.requestFocus()
-            return
+            etEmail.error = "Invalid Email"; return
         }
         if (password.isEmpty()) {
-            etPassword.error = "Password is required"
-            etPassword.requestFocus()
-            return
+            etPassword.error = "Password is required"; return
         }
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                    goToHomeActivity()
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        checkRoleAndRedirect(uid) // [Updated]
+                    }
                 } else {
                     Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
     }
 
-    private fun goToHomeActivity() {
-        val intent = Intent(this, UserHomeActivity::class.java)
-        // Login thaya pachi Back dabave to fari login page na aave
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
+    // --- [NEW MAIN FUNCTION] Role Check Logic ---
+    private fun checkRoleAndRedirect(uid: String) {
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val role = document.getString("role")
+
+                    val intent = when (role) {
+                        "provider" -> Intent(
+                            this,
+                            ProviderHomeActivity::class.java
+                        ) // Ensure this Activity exists
+                        "admin" -> Intent(
+                            this,
+                            AdminHomeActivity::class.java
+                        )       // Ensure this Activity exists
+                        else -> Intent(this, UserHomeActivity::class.java)
+                    }
+
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "User data not found", Toast.LENGTH_SHORT).show()
+                    auth.signOut() // Data nathi to logout karavo safety mate
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error fetching user role", Toast.LENGTH_SHORT).show()
+            }
     }
 }

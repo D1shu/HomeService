@@ -28,6 +28,14 @@
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.UserHomeActivity" />
 
+        <activity
+            android:name=".activities.ProviderHomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activities.AdminHomeActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
